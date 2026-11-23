@@ -1,0 +1,66 @@
+import cv2
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload video
+uploaded = files.upload()
+video_path = list(uploaded.keys())[0]
+
+# Load vehicle detection classifier
+vehicle_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_car.xml'
+)
+
+# Open video
+cap = cv2.VideoCapture(video_path)
+
+# Check video
+if not cap.isOpened():
+    print("Error opening video")
+
+else:
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            break
+
+        # Resize frame
+        frame = cv2.resize(frame, (640, 480))
+
+        # Convert to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Detect vehicles
+        vehicles = vehicle_cascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=3,
+            minSize=(40, 40)
+        )
+
+        # Draw rectangles
+        for (x, y, w, h) in vehicles:
+            cv2.rectangle(
+                frame,
+                (x, y),
+                (x+w, y+h),
+                (0, 255, 0),
+                2
+            )
+
+            cv2.putText(
+                frame,
+                "Vehicle",
+                (x, y-10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 0),
+                2
+            )
+
+        # Display processed frame
+        cv2_imshow(frame)
+
+    cap.release()
+    print("Vehicle detection completed!")

@@ -1,0 +1,48 @@
+import cv2
+import matplotlib.pyplot as plt
+from google.colab import files
+
+# Upload image
+uploaded = files.upload()
+image_path = list(uploaded.keys())[0]
+
+# Read image
+img = cv2.imread(image_path)
+
+# Convert image to grayscale
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Load Haar Cascade eye detector
+eye_cascade = cv2.CascadeClassifier(
+    cv2.data.haarcascades + 'haarcascade_eye.xml'
+)
+
+# Detect eyes
+eyes = eye_cascade.detectMultiScale(
+    gray,
+    scaleFactor=1.1,
+    minNeighbors=5,
+    minSize=(20, 20)
+)
+
+# Draw rectangles around detected eyes
+for (x, y, w, h) in eyes:
+    cv2.rectangle(
+        img,
+        (x, y),
+        (x+w, y+h),
+        (0, 255, 0),
+        2
+    )
+
+# Display output
+img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+plt.figure(figsize=(8, 6))
+plt.imshow(img_rgb)
+plt.title("Eye Detection Using OpenCV")
+plt.axis("off")
+plt.show()
+
+# Display number of eyes
+print("Number of eyes detected:", len(eyes))

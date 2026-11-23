@@ -1,0 +1,48 @@
+import cv2
+from google.colab import files
+
+# Upload video
+uploaded = files.upload()
+video_path = list(uploaded.keys())[0]
+
+# Read video
+cap = cv2.VideoCapture(video_path)
+
+frames = []
+
+# Extract all frames
+while True:
+    ret, frame = cap.read()
+
+    if not ret:
+        break
+
+    frames.append(frame)
+
+cap.release()
+
+# Reverse the frames
+frames.reverse()
+
+# Get video properties
+height, width, _ = frames[0].shape
+fps = 20
+
+# Create reversed video
+output = cv2.VideoWriter(
+    'reverse_video.mp4',
+    cv2.VideoWriter_fourcc(*'mp4v'),
+    fps,
+    (width, height)
+)
+
+# Write reversed frames
+for frame in frames:
+    output.write(frame)
+
+output.release()
+
+print("Video reversed successfully!")
+
+# Download output video
+files.download('reverse_video.mp4')
